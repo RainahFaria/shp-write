@@ -1,6 +1,6 @@
-# shp-write
-
 [![Build Status](https://secure.travis-ci.org/mapbox/shp-write.svg?branch=master)](http://travis-ci.org/mapbox/shp-write)
+
+# shp-write
 
 Writes shapefile in pure javascript. Uses [dbf](https://github.com/tmcw/dbf)
 for the data component, and [jsZIP](http://stuk.github.io/jszip/) to generate
@@ -16,30 +16,26 @@ Or in a browser
 
     https://unpkg.com/shp-write@latest/shpwrite.js
 
-## Testing
-
-To test the download functionality run `npm run make-test` and open index.html in browser.
-This should start an immediate download of test features defined in `indexTest.js`.
-
 ## Caveats
 
 * Requires a capable fancy modern browser with [Typed Arrays](http://caniuse.com/#feat=typedarrays)
   support
 * Geometries: Point, LineString, Polygon, MultiLineString, MultiPolygon
 * Tabular-style properties export with Shapefile's field name length limit
+* Uses jsZip for ZIP files, but [compression is buggy](https://github.com/Stuk/jszip/issues/53) so it uses STORE instead of DEFLATE.
 
 ## Example
 
 ```js
 var shpwrite = require('shp-write');
 
-// (optional) set names for zip file, zipped folder and feature types
+// (optional) set names for feature types and zipped folder
 var options = {
     folder: 'myshapes',
     types: {
         point: 'mypoints',
         polygon: 'mypolygons',
-        polyline: 'mylines'
+        line: 'mylines'
     }
 }
 // a GeoJSON bridge for features
@@ -71,6 +67,23 @@ shpwrite.download({
 // triggers a download of a zip file with shapefiles contained within.
 ```
 
+## Custom .prj file (optional)
+To pass a custom [WKT string](https://www.ogc.org/standards/wkt-crs) in the .prj file to define a different projection the prj option can be used:
+
+```js
+var options = {
+    folder: 'myshapes',
+    types: {
+        point: 'mypoints',
+        polygon: 'mypolygons',
+        line: 'mylines'
+    },
+    prj: 'PROJCS["Amersfoort / RD New",GEOGCS["Amersfoort",DATUM["D_Amersfoort",SPHEROID["Bessel_1841",6377397.155,299.1528128]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Stereographic_North_Pole"],PARAMETER["standard_parallel_1",52.15616055555555],PARAMETER["central_meridian",5.38763888888889],PARAMETER["scale_factor",0.9999079],PARAMETER["false_easting",155000],PARAMETER["false_northing",463000],UNIT["Meter",1]]'
+}
+```
+
+The definition of each parameters in .prj file can be found in [ESRI_PRJ](https://vsp.pnnl.gov/help/Vsample/ESRI_PRJ_File.htm)
+
 ## API
 
 ### `download(geojson)`
@@ -99,20 +112,12 @@ object.
 
 ## Other Implementations
 
-* [https://code.google.com/p/pyshp/](https://code.google.com/p/pyshp/)
+* https://code.google.com/p/pyshp/
 
 ## Reference
 
-* [http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf](http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf)
+* http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
 
 ## Contributors
 
 * Nick Baugh <niftylettuce@gmail.com>
-
-## Pull requests contained in this branch
-
-This branch includes the following PRs of the official repository:
-
-* [IE download fix](https://github.com/mapbox/shp-write/pull/50) (merged manually as the source repo is gone)
-* [Fix point export](https://github.com/mapbox/shp-write/pull/69)
-* [Fixed extraction of polygon coordinates](https://github.com/mapbox/shp-write/pull/65)
